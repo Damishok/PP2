@@ -1,0 +1,5 @@
+f = open('b.txt', 'r')
+print(f.closed)
+f.close()
+print(f.closed)
+print(type(f.closed))
