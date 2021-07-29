@@ -1,5 +1,7 @@
 import pygame as pg 
 import sys 
+from settings import * 
+from sprites.sprites import * 
 import os 
 import json 
  
@@ -64,7 +66,14 @@ class Game:
             f.write(json.dumps(game_state)) 
         self.snake.change_dir() 
         self.second_snake.change_dir() 
-  
+ 
+    def load_data(self): 
+        self.maps = {} 
+        for map_name in os.listdir(os.getcwd() + "/tile_maps"): 
+            with open(f"tile_maps/{map_name}", "r") as f: 
+                self.maps[map_name] = f.readlines() 
+        print(self.maps) 
+ 
     def new(self): 
         self.all_sprites = pg.sprite.Group() 
         self.walls = pg.sprite.Group() 
@@ -105,7 +114,58 @@ class Game:
             self.events() 
             self.update() 
             self.draw() 
-
+ 
+ 
+    def quit(self): 
+        pg.quit() 
+        sys.exit() 
+ 
+    def update(self): 
+        self.all_sprites.update() 
+ 
+    def draw_grid(self): 
+        for x in range(0, SCREEN_WIDTH, TILE_SIZE): 
+            pg.draw.line(self.screen, BLUE, (x, 0), (x, SCREEN_HEIGHT)) 
+        for y in range(0, SCREEN_HEIGHT, TILE_SIZE): 
+            pg.draw.line(self.screen, BLUE, (0, y), (SCREEN_WIDTH, y)) 
+ 
+    def draw(self): 
+        self.screen.fill(BGCOLOR) 
+        self.draw_grid() 
+        self.all_sprites.draw(self.screen) 
+        pg.display.flip() 
+ 
+    def events(self): 
+        for event in pg.event.get(): 
+            if event.type == pg.QUIT: 
+                self.save_game() 
+                self.quit() 
+            if event.type == pg.KEYDOWN: 
+                if event.key == pg.K_ESCAPE: 
+                    self.save_game() 
+                    self.quit() 
+                if event.key == pg.K_LEFT: 
+                    self.snake.change_dir(dx=-1) 
+                if event.key == pg.K_RIGHT: 
+                    self.snake.change_dir(dx=1) 
+                if event.key == pg.K_UP: 
+                    self.snake.change_dir(dy=-1) 
+                if event.key == pg.K_DOWN: 
+                    self.snake.change_dir(dy=1) 
+                if event.key == pg.K_a: 
+                    self.second_snake.change_dir(dx=-1) 
+                if event.key == pg.K_d: 
+                    self.second_snake.change_dir(dx=1) 
+                if event.key == pg.K_w: 
+                    self.second_snake.change_dir(dy=-1) 
+                if event.key == pg.K_s: 
+                    self.second_snake.change_dir(dy=1) 
+                if event.key == pg.K_1: 
+                    self.save_game() 
+                if event.key == pg.K_2: 
+                    self.load_game() 
+ 
+ 
 g = Game() 
 while True: 
     g.run()
